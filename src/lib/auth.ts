@@ -90,18 +90,30 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
+        // For Google OAuth, user.id is Google's numeric ID (not our DB UUID).
+        // Look up the DB user by email to get the correct UUID.
+        const email = user.email ?? token.email;
+        if (email) {
+          const [dbUser] = await db
+            .select()
+            .from(schema.users)
+            .where(eq(schema.users.email, email as string))
+            .limit(1);
 
-        // Fetch org membership
-        const [membership] = await db
-          .select()
-          .from(schema.orgMembers)
-          .where(eq(schema.orgMembers.userId, user.id as string))
-          .limit(1);
+          if (dbUser) {
+            token.id = dbUser.id;
 
-        if (membership) {
-          token.orgId = membership.orgId;
-          token.role = membership.role;
+            const [membership] = await db
+              .select()
+              .from(schema.orgMembers)
+              .where(eq(schema.orgMembers.userId, dbUser.id))
+              .limit(1);
+
+            if (membership) {
+              token.orgId = membership.orgId;
+              token.role = membership.role;
+            }
+          }
         }
       }
       return token;
