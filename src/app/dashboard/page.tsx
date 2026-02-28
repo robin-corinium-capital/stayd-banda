@@ -81,7 +81,7 @@ export default async function DashboardPage() {
         {/* Properties card */}
         <Link
           href="/properties"
-          className="rounded-lg bg-white p-6 shadow-sm ring-1 ring-gray-200 hover:ring-blue-300 transition-all"
+          className="rounded-card bg-surface-card p-6 shadow-sm ring-1 ring-surface-border hover:ring-brand/30 transition-all"
         >
           <h3 className="text-sm font-medium text-gray-500">Properties</h3>
           <p className="mt-2 text-3xl font-bold text-gray-900">
@@ -93,7 +93,10 @@ export default async function DashboardPage() {
         </Link>
 
         {/* Recent turnovers card */}
-        <div className="rounded-lg bg-white p-6 shadow-sm ring-1 ring-gray-200">
+        <Link
+          href="/turnovers"
+          className="rounded-card bg-surface-card p-6 shadow-sm ring-1 ring-surface-border hover:ring-brand/30 transition-all"
+        >
           <h3 className="text-sm font-medium text-gray-500">Turnovers</h3>
           <p className="mt-2 text-3xl font-bold text-gray-900">
             {turnoverCount}
@@ -101,10 +104,10 @@ export default async function DashboardPage() {
           <p className="mt-1 text-sm text-gray-500">
             {turnoverCount === 0 ? "No turnovers yet" : "total turnovers"}
           </p>
-        </div>
+        </Link>
 
         {/* Flagged items card */}
-        <div className="rounded-lg bg-white p-6 shadow-sm ring-1 ring-gray-200">
+        <div className="rounded-card bg-surface-card p-6 shadow-sm ring-1 ring-surface-border">
           <h3 className="text-sm font-medium text-gray-500">Flagged Items</h3>
           <p className="mt-2 text-3xl font-bold text-gray-900">
             {flaggedCount}
@@ -117,14 +120,14 @@ export default async function DashboardPage() {
 
       {/* Quick actions */}
       {propertyCount === 0 && role === "owner" && (
-        <div className="mt-8 rounded-lg bg-blue-50 p-6 ring-1 ring-blue-200">
-          <h3 className="text-sm font-semibold text-blue-900">Get started</h3>
-          <p className="mt-1 text-sm text-blue-700">
+        <div className="mt-8 rounded-card bg-brand-dim p-6 ring-1 ring-brand/20">
+          <h3 className="text-sm font-semibold text-brand">Get started</h3>
+          <p className="mt-1 text-sm text-brand">
             Add your first property to start documenting turnovers.
           </p>
           <Link
             href="/properties/new"
-            className="mt-3 inline-block rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            className="mt-3 inline-block rounded-btn bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-light"
           >
             Add property
           </Link>
