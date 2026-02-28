@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
-import { eq, and, inArray, desc, gte, lte, sql, count } from "drizzle-orm";
+import { eq, and, inArray, desc, asc, gte, lte, sql, count, ilike, or, exists } from "drizzle-orm";
 import { getApiSession, isAuthError } from "@/lib/auth-helpers";
 
 // GET /api/turnovers — list turnovers for user's org
@@ -14,6 +14,11 @@ export async function GET(req: NextRequest) {
   const status = searchParams.get("status");
   const dateFrom = searchParams.get("date_from");
   const dateTo = searchParams.get("date_to");
+  const search = searchParams.get("search");
+  const hasDamage = searchParams.get("has_damage");
+  const sort = searchParams.get("sort") || "checkout_desc";
+  const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+  const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "20", 10)));
 
   // Get accessible property IDs
   let accessiblePropertyIds: string[];
@@ -25,7 +30,7 @@ export async function GET(req: NextRequest) {
       .where(eq(schema.propertyAssignments.userId, session.userId));
 
     if (assignments.length === 0) {
-      return NextResponse.json([]);
+      return NextResponse.json({ turnovers: [], totalCount: 0, page, limit, totalPages: 0 });
     }
     accessiblePropertyIds = assignments.map((a) => a.propertyId);
   } else {
@@ -37,8 +42,23 @@ export async function GET(req: NextRequest) {
   }
 
   if (accessiblePropertyIds.length === 0) {
-    return NextResponse.json([]);
+    return NextResponse.json({ turnovers: [], totalCount: 0, page, limit, totalPages: 0 });
   }
+
+  // Auto-complete overdue turnovers: checkinDate < today - 24h AND status = 'in_progress'
+  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const oneDayAgoDate = oneDayAgo.toISOString().split("T")[0];
+
+  await db
+    .update(schema.turnovers)
+    .set({ status: "complete", completedAt: new Date() })
+    .where(
+      and(
+        inArray(schema.turnovers.propertyId, accessiblePropertyIds),
+        eq(schema.turnovers.status, "in_progress"),
+        lte(schema.turnovers.checkinDate, oneDayAgoDate)
+      )
+    );
 
   // If filtering by property, validate access
   if (propertyId && !accessiblePropertyIds.includes(propertyId)) {
@@ -67,7 +87,59 @@ export async function GET(req: NextRequest) {
     conditions.push(lte(schema.turnovers.checkoutDate, dateTo));
   }
 
-  // Fetch turnovers with property name and photo counts
+  if (search && search.trim()) {
+    const searchPattern = `%${search.trim()}%`;
+    conditions.push(
+      or(
+        ilike(schema.turnovers.departingGuestRef, searchPattern),
+        ilike(schema.turnovers.arrivingGuestRef, searchPattern)
+      )!
+    );
+  }
+
+  if (hasDamage === "true") {
+    conditions.push(
+      exists(
+        db
+          .select({ one: sql`1` })
+          .from(schema.photos)
+          .where(
+            and(
+              eq(schema.photos.turnoverId, schema.turnovers.id),
+              eq(schema.photos.isDamageFlagged, true)
+            )
+          )
+      )
+    );
+  }
+
+  // Determine sort order
+  const orderByClause = (() => {
+    switch (sort) {
+      case "checkout_asc":
+        return asc(schema.turnovers.checkoutDate);
+      case "checkin_desc":
+        return desc(schema.turnovers.checkinDate);
+      case "checkin_asc":
+        return asc(schema.turnovers.checkinDate);
+      default:
+        return desc(schema.turnovers.checkoutDate);
+    }
+  })();
+
+  // Count total matching turnovers
+  const [{ totalCount }] = await db
+    .select({ totalCount: count() })
+    .from(schema.turnovers)
+    .innerJoin(
+      schema.properties,
+      eq(schema.turnovers.propertyId, schema.properties.id)
+    )
+    .where(and(...conditions));
+
+  const totalPages = Math.ceil(totalCount / limit);
+
+  // Fetch paginated turnovers
   const turnovers = await db
     .select({
       id: schema.turnovers.id,
@@ -87,7 +159,9 @@ export async function GET(req: NextRequest) {
       eq(schema.turnovers.propertyId, schema.properties.id)
     )
     .where(and(...conditions))
-    .orderBy(desc(schema.turnovers.checkoutDate));
+    .orderBy(orderByClause)
+    .limit(limit)
+    .offset((page - 1) * limit);
 
   // Get photo counts and damage flag counts per turnover
   const turnoverIds = turnovers.map((t) => t.id);
@@ -126,7 +200,7 @@ export async function GET(req: NextRequest) {
     flaggedCount: photoCounts[t.id]?.flagged ?? 0,
   }));
 
-  return NextResponse.json(result);
+  return NextResponse.json({ turnovers: result, totalCount, page, limit, totalPages });
 }
 
 // POST /api/turnovers — create turnover

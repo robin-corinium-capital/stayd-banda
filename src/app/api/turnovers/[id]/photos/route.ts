@@ -58,10 +58,32 @@ export async function GET(
     }
   }
 
-  // Fetch photos
+  // Fetch photos with uploader name
   const photos = await db
-    .select()
+    .select({
+      id: schema.photos.id,
+      turnoverId: schema.photos.turnoverId,
+      areaId: schema.photos.areaId,
+      photoSet: schema.photos.photoSet,
+      r2KeyOriginal: schema.photos.r2KeyOriginal,
+      r2KeyThumbnail: schema.photos.r2KeyThumbnail,
+      originalFilename: schema.photos.originalFilename,
+      fileSizeBytes: schema.photos.fileSizeBytes,
+      mimeType: schema.photos.mimeType,
+      uploadTimestamp: schema.photos.uploadTimestamp,
+      captureTimestamp: schema.photos.captureTimestamp,
+      gpsLatitude: schema.photos.gpsLatitude,
+      gpsLongitude: schema.photos.gpsLongitude,
+      deviceMake: schema.photos.deviceMake,
+      deviceModel: schema.photos.deviceModel,
+      isDamageFlagged: schema.photos.isDamageFlagged,
+      damageNote: schema.photos.damageNote,
+      uploadedBy: schema.photos.uploadedBy,
+      createdAt: schema.photos.createdAt,
+      uploaderName: schema.users.name,
+    })
     .from(schema.photos)
+    .leftJoin(schema.users, eq(schema.photos.uploadedBy, schema.users.id))
     .where(eq(schema.photos.turnoverId, id))
     .orderBy(schema.photos.uploadTimestamp);
 

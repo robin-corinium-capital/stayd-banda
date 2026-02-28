@@ -4,6 +4,7 @@ import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { eq, and, count } from "drizzle-orm";
 import Link from "next/link";
+import { FlaggedItemsSection } from "./flagged-items";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -107,7 +108,10 @@ export default async function DashboardPage() {
         </Link>
 
         {/* Flagged items card */}
-        <div className="rounded-card bg-surface-card p-6 shadow-sm ring-1 ring-surface-border">
+        <Link
+          href="/turnovers?has_damage=true"
+          className="rounded-card bg-surface-card p-6 shadow-sm ring-1 ring-surface-border hover:ring-brand/30 transition-all"
+        >
           <h3 className="text-sm font-medium text-gray-500">Flagged Items</h3>
           <p className="mt-2 text-3xl font-bold text-gray-900">
             {flaggedCount}
@@ -115,8 +119,11 @@ export default async function DashboardPage() {
           <p className="mt-1 text-sm text-gray-500">
             {flaggedCount === 0 ? "No flagged items" : "flagged photos"}
           </p>
-        </div>
+        </Link>
       </div>
+
+      {/* Flagged items section */}
+      <FlaggedItemsSection />
 
       {/* Quick actions */}
       {propertyCount === 0 && role === "owner" && (

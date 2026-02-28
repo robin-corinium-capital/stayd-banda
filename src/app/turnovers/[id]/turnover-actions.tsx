@@ -125,3 +125,33 @@ export function TurnoverActions({
     </>
   );
 }
+
+export function MarkCompleteButton({ turnoverId }: { turnoverId: string }) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
+  async function handleClick() {
+    setLoading(true);
+    try {
+      await fetch(`/api/turnovers/${turnoverId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "complete" }),
+      });
+      router.refresh();
+    } catch {
+      // Silently fail
+    }
+    setLoading(false);
+  }
+
+  return (
+    <button
+      onClick={handleClick}
+      disabled={loading}
+      className="rounded-btn bg-status-pass px-4 py-2 text-sm font-medium text-gray-900 hover:bg-status-pass/80 disabled:opacity-50"
+    >
+      {loading ? "Completing..." : "Mark complete"}
+    </button>
+  );
+}

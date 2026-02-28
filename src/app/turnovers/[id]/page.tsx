@@ -4,8 +4,8 @@ import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { eq, and, count, sql } from "drizzle-orm";
 import Link from "next/link";
-import { TurnoverActions } from "./turnover-actions";
-import { PhotoGrid } from "./photo-grid";
+import { TurnoverActions, MarkCompleteButton } from "./turnover-actions";
+import { PhotoSections } from "./photo-sections";
 
 export default async function TurnoverDetailPage({
   params,
@@ -107,7 +107,12 @@ export default async function TurnoverDetailPage({
         <div className="mt-4 flex items-start justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              {turnover.propertyName}
+              <Link
+                href={`/properties/${turnover.propertyId}`}
+                className="hover:text-brand hover:underline"
+              >
+                {turnover.propertyName}
+              </Link>
             </h1>
             <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-gray-600">
               <span>
@@ -136,12 +141,27 @@ export default async function TurnoverDetailPage({
             )}
           </div>
           <div className="flex items-center gap-2">
+            {turnover.status !== "complete" && role === "owner" && (
+              <MarkCompleteButton turnoverId={id} />
+            )}
             <Link
               href={`/upload/${turnover.propertyId}/${turnover.id}`}
               className="rounded-btn bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-light"
             >
               Upload photos
             </Link>
+            <button
+              disabled
+              className="rounded-btn border border-gray-300 px-4 py-2 text-sm font-medium text-gray-400 cursor-not-allowed"
+            >
+              Download ZIP
+            </button>
+            <button
+              disabled
+              className="rounded-btn border border-gray-300 px-4 py-2 text-sm font-medium text-gray-400 cursor-not-allowed"
+            >
+              Download report
+            </button>
             {role === "owner" && (
               <TurnoverActions
                 turnoverId={id}
@@ -198,43 +218,13 @@ export default async function TurnoverDetailPage({
           </Link>
         </div>
       ) : (
-        <div className="space-y-8">
-          {/* Post-checkout photos */}
-          <div>
-            <h2 className="mb-4 text-lg font-semibold text-amber-800">
-              After guest left ({postCheckoutPhotos.length})
-            </h2>
-            {postCheckoutPhotos.length === 0 ? (
-              <p className="text-sm text-gray-500">
-                No post-checkout photos yet.
-              </p>
-            ) : (
-              <PhotoGrid
-                photos={postCheckoutPhotos}
-                areas={areas}
-                turnoverId={id}
-              />
-            )}
-          </div>
-
-          {/* Pre-checkin photos */}
-          <div>
-            <h2 className="mb-4 text-lg font-semibold text-green-800">
-              Before next guest ({preCheckinPhotos.length})
-            </h2>
-            {preCheckinPhotos.length === 0 ? (
-              <p className="text-sm text-gray-500">
-                No pre-checkin photos yet.
-              </p>
-            ) : (
-              <PhotoGrid
-                photos={preCheckinPhotos}
-                areas={areas}
-                turnoverId={id}
-              />
-            )}
-          </div>
-        </div>
+        <PhotoSections
+          turnoverId={id}
+          areas={areas}
+          postCheckoutPhotos={postCheckoutPhotos}
+          preCheckinPhotos={preCheckinPhotos}
+          role={role}
+        />
       )}
     </div>
   );
