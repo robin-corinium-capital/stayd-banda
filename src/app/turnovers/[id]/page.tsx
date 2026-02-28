@@ -6,6 +6,7 @@ import { eq, and, count, sql } from "drizzle-orm";
 import Link from "next/link";
 import { TurnoverActions, MarkCompleteButton } from "./turnover-actions";
 import { PhotoSections } from "./photo-sections";
+import { ExportButtons } from "./export-buttons";
 
 export default async function TurnoverDetailPage({
   params,
@@ -150,18 +151,14 @@ export default async function TurnoverDetailPage({
             >
               Upload photos
             </Link>
-            <button
-              disabled
-              className="rounded-btn border border-gray-300 px-4 py-2 text-sm font-medium text-gray-400 cursor-not-allowed"
-            >
-              Download ZIP
-            </button>
-            <button
-              disabled
-              className="rounded-btn border border-gray-300 px-4 py-2 text-sm font-medium text-gray-400 cursor-not-allowed"
-            >
-              Download report
-            </button>
+            <ExportButtons
+              turnoverId={id}
+              propertyName={turnover.propertyName}
+              checkoutDate={turnover.checkoutDate}
+              checkinDate={turnover.checkinDate}
+              hasPhotos={photos.length > 0}
+              hasFlaggedPhotos={flaggedPhotos.length > 0}
+            />
             {role === "owner" && (
               <TurnoverActions
                 turnoverId={id}

@@ -5,6 +5,7 @@ import * as schema from "@/db/schema";
 import { eq, and, count } from "drizzle-orm";
 import Link from "next/link";
 import { PropertyActions } from "./property-actions";
+import { PropertyExport } from "./property-export";
 
 export default async function PropertyDetailPage({
   params,
@@ -180,6 +181,10 @@ export default async function PropertyDetailPage({
               {turnoverCount === 0 ? "No turnovers yet" : "total turnovers"}
             </p>
           </div>
+
+          {role === "owner" && turnoverCount > 0 && (
+            <PropertyExport propertyId={id} propertyName={property.name} />
+          )}
         </div>
       </div>
     </div>

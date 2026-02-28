@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
@@ -35,5 +36,9 @@ export default async function TurnoversPage() {
       .where(eq(schema.properties.orgId, orgId));
   }
 
-  return <TurnoversListClient properties={properties} role={role} />;
+  return (
+    <Suspense>
+      <TurnoversListClient properties={properties} role={role} />
+    </Suspense>
+  );
 }

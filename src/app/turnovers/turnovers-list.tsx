@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 /* ------------------------------------------------------------------ */
@@ -70,13 +71,16 @@ export function TurnoversListClient({
   properties,
   role,
 }: TurnoversListClientProps) {
+  /* — Read initial filter values from URL search params — */
+  const searchParams = useSearchParams();
+
   /* — Filter / sort / pagination state — */
-  const [propertyId, setPropertyId] = useState("");
-  const [status, setStatus] = useState("");
-  const [dateFrom, setDateFrom] = useState("");
-  const [dateTo, setDateTo] = useState("");
-  const [hasDamage, setHasDamage] = useState(false);
-  const [search, setSearch] = useState("");
+  const [propertyId, setPropertyId] = useState(searchParams.get("property_id") ?? "");
+  const [status, setStatus] = useState(searchParams.get("status") ?? "");
+  const [dateFrom, setDateFrom] = useState(searchParams.get("date_from") ?? "");
+  const [dateTo, setDateTo] = useState(searchParams.get("date_to") ?? "");
+  const [hasDamage, setHasDamage] = useState(searchParams.get("has_damage") === "true");
+  const [search, setSearch] = useState(searchParams.get("search") ?? "");
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState("checkout_desc");
 

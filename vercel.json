@@ -1,4 +1,9 @@
 {
   "framework": "nextjs",
-  "regions": ["lhr1"]
+  "regions": ["lhr1"],
+  "functions": {
+    "src/app/api/export/**/*.ts": {
+      "maxDuration": 60
+    }
+  }
 }
