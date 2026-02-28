@@ -226,7 +226,7 @@ export default function ManageAreasPage() {
       )}
 
       {/* Add area form */}
-      <div className="mb-6 rounded-lg bg-white p-4 shadow-sm ring-1 ring-gray-200">
+      <div className="mb-6 rounded-card bg-surface-card p-4 shadow-sm ring-1 ring-surface-border">
         <h2 className="text-sm font-medium text-gray-900 mb-3">Add area</h2>
         <form onSubmit={handleAdd} className="flex flex-col gap-3">
           <div className="flex gap-3">
@@ -236,12 +236,12 @@ export default function ManageAreasPage() {
               onChange={(e) => setNewName(e.target.value)}
               placeholder="Area name (e.g. Kitchen)"
               required
-              className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
             />
             <button
               type="submit"
               disabled={adding || !newName.trim()}
-              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+              className="rounded-btn bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-light disabled:opacity-50"
             >
               {adding ? "Adding..." : "Add"}
             </button>
@@ -251,14 +251,14 @@ export default function ManageAreasPage() {
             value={newDescription}
             onChange={(e) => setNewDescription(e.target.value)}
             placeholder="Description (optional)"
-            className="rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
           />
         </form>
       </div>
 
       {/* Area list */}
       {areas.length === 0 ? (
-        <div className="rounded-lg bg-white p-8 text-center shadow-sm ring-1 ring-gray-200">
+        <div className="rounded-card bg-surface-card p-8 text-center shadow-sm ring-1 ring-surface-border">
           <p className="text-sm text-gray-500">
             No areas yet. Add your first area above.
           </p>
@@ -268,7 +268,7 @@ export default function ManageAreasPage() {
           {areas.map((area, index) => (
             <div
               key={area.id}
-              className="rounded-lg bg-white p-4 shadow-sm ring-1 ring-gray-200"
+              className="rounded-card bg-surface-card p-4 shadow-sm ring-1 ring-surface-border"
             >
               {editingId === area.id ? (
                 <div className="space-y-3">
@@ -276,20 +276,20 @@ export default function ManageAreasPage() {
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
                   />
                   <input
                     type="text"
                     value={editDescription}
                     onChange={(e) => setEditDescription(e.target.value)}
                     placeholder="Description (optional)"
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
                   />
                   <div className="flex gap-2">
                     <button
                       onClick={handleSaveEdit}
                       disabled={saving}
-                      className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                      className="rounded-btn bg-brand px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-light disabled:opacity-50"
                     >
                       {saving ? "Saving..." : "Save"}
                     </button>
@@ -373,7 +373,7 @@ export default function ManageAreasPage() {
       {/* Delete confirmation modal */}
       {deleteTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-          <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
+          <div className="w-full max-w-sm rounded-card bg-surface-card p-6 shadow-xl">
             <h3 className="text-lg font-semibold text-gray-900">
               Delete area
             </h3>

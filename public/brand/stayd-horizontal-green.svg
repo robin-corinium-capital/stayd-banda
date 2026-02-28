@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="790" height="310" viewBox="185 25 790 310">
+  <g fill="none" stroke="#00402E" stroke-width="20" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M208 260 L260 135 L312 260"/>
+  </g>
+  <text x="412" y="260"
+    fill="#00402E"
+    font-family="Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif"
+    font-size="220"
+    font-weight="600"
+    letter-spacing="-2.2"
+    dominant-baseline="alphabetic">stayd</text>
+</svg>

@@ -81,7 +81,7 @@ export default async function PropertiesPage() {
         {role === "owner" && (
           <Link
             href="/properties/new"
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            className="rounded-btn bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-light"
           >
             Add property
           </Link>
@@ -89,7 +89,7 @@ export default async function PropertiesPage() {
       </div>
 
       {propertiesList.length === 0 ? (
-        <div className="rounded-lg bg-white p-12 text-center shadow-sm ring-1 ring-gray-200">
+        <div className="rounded-card bg-surface-card p-12 text-center shadow-sm ring-1 ring-surface-border">
           <svg
             className="mx-auto h-12 w-12 text-gray-400"
             fill="none"
@@ -114,7 +114,7 @@ export default async function PropertiesPage() {
           {role === "owner" && (
             <Link
               href="/properties/new"
-              className="mt-4 inline-block rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+              className="mt-4 inline-block rounded-btn bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-light"
             >
               Add property
             </Link>
@@ -126,7 +126,7 @@ export default async function PropertiesPage() {
             <Link
               key={property.id}
               href={`/properties/${property.id}`}
-              className="block rounded-lg bg-white p-6 shadow-sm ring-1 ring-gray-200 hover:ring-blue-300 transition-all"
+              className="block rounded-card bg-surface-card p-6 shadow-sm ring-1 ring-surface-border hover:ring-brand/30 transition-all"
             >
               <div className="flex items-start justify-between">
                 <h3 className="text-base font-semibold text-gray-900">

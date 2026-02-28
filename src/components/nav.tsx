@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import { useState } from "react";
 
@@ -10,13 +11,19 @@ export function Nav() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   return (
-    <nav className="border-b border-gray-200 bg-white">
+    <nav className="border-b border-surface-border bg-surface-card">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link href={session ? "/dashboard" : "/"} className="flex items-baseline gap-1">
-            <span className="text-xl font-bold text-gray-900">banda</span>
-            <span className="text-xs text-gray-500">by stayd</span>
+          <Link href={session ? "/dashboard" : "/"} className="flex items-center">
+            <Image
+              src="/brand/stayd-horizontal-black.svg"
+              alt="stayd"
+              width={790}
+              height={310}
+              className="h-8 w-auto"
+              priority
+            />
           </Link>
 
           {/* Desktop nav */}
@@ -44,23 +51,23 @@ export function Nav() {
                     onClick={() => setDropdownOpen(!dropdownOpen)}
                     className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
                   >
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white text-xs font-medium">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-white text-xs font-medium">
                       {session.user.name?.[0]?.toUpperCase() || session.user.email?.[0]?.toUpperCase()}
                     </div>
                     <span>{session.user.name || session.user.email}</span>
                   </button>
                   {dropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-48 rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 z-50">
+                    <div className="absolute right-0 mt-2 w-48 rounded-btn bg-surface-card py-1 shadow-lg ring-1 ring-black/5 z-50">
                       <Link
                         href="/settings"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-surface"
                         onClick={() => setDropdownOpen(false)}
                       >
                         Settings
                       </Link>
                       <button
                         onClick={() => signOut({ callbackUrl: "/" })}
-                        className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+                        className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-surface"
                       >
                         Sign out
                       </button>
@@ -75,7 +82,7 @@ export function Nav() {
                 </Link>
                 <Link
                   href="/register"
-                  className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                  className="rounded-btn bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-light"
                 >
                   Register
                 </Link>
@@ -100,39 +107,39 @@ export function Nav() {
 
         {/* Mobile menu */}
         {mobileOpen && (
-          <div className="border-t border-gray-200 pb-4 md:hidden">
+          <div className="border-t border-surface-border pb-4 md:hidden">
             {session ? (
               <div className="space-y-1 pt-2">
-                <Link href="/dashboard" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                <Link href="/dashboard" className="block px-3 py-2 text-sm text-gray-600 hover:bg-surface" onClick={() => setMobileOpen(false)}>
                   Dashboard
                 </Link>
-                <Link href="/properties" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                <Link href="/properties" className="block px-3 py-2 text-sm text-gray-600 hover:bg-surface" onClick={() => setMobileOpen(false)}>
                   Properties
                 </Link>
-                <Link href="/turnovers" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                <Link href="/turnovers" className="block px-3 py-2 text-sm text-gray-600 hover:bg-surface" onClick={() => setMobileOpen(false)}>
                   Turnovers
                 </Link>
                 {session.user.role === "cleaner" && (
-                  <Link href="/upload" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                  <Link href="/upload" className="block px-3 py-2 text-sm text-gray-600 hover:bg-surface" onClick={() => setMobileOpen(false)}>
                     Upload
                   </Link>
                 )}
-                <Link href="/settings" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                <Link href="/settings" className="block px-3 py-2 text-sm text-gray-600 hover:bg-surface" onClick={() => setMobileOpen(false)}>
                   Settings
                 </Link>
                 <button
                   onClick={() => signOut({ callbackUrl: "/" })}
-                  className="block w-full px-3 py-2 text-left text-sm text-gray-600 hover:bg-gray-50"
+                  className="block w-full px-3 py-2 text-left text-sm text-gray-600 hover:bg-surface"
                 >
                   Sign out
                 </button>
               </div>
             ) : (
               <div className="space-y-1 pt-2">
-                <Link href="/login" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                <Link href="/login" className="block px-3 py-2 text-sm text-gray-600 hover:bg-surface" onClick={() => setMobileOpen(false)}>
                   Login
                 </Link>
-                <Link href="/register" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                <Link href="/register" className="block px-3 py-2 text-sm text-gray-600 hover:bg-surface" onClick={() => setMobileOpen(false)}>
                   Register
                 </Link>
               </div>

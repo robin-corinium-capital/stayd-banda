@@ -100,7 +100,7 @@ export default function EditPropertyPage() {
         </h1>
       </div>
 
-      <div className="rounded-lg bg-white p-6 shadow-sm ring-1 ring-gray-200">
+      <div className="rounded-card bg-surface-card p-6 shadow-sm ring-1 ring-surface-border">
         <form onSubmit={handleSubmit} className="space-y-5">
           {error && (
             <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">
@@ -121,7 +121,7 @@ export default function EditPropertyPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
             />
           </div>
 
@@ -137,7 +137,7 @@ export default function EditPropertyPage() {
               type="text"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
             />
           </div>
 
@@ -153,7 +153,7 @@ export default function EditPropertyPage() {
                 id="propertyType"
                 value={propertyType}
                 onChange={(e) => setPropertyType(e.target.value)}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
               >
                 <option value="">Select...</option>
                 <option value="house">House</option>
@@ -180,7 +180,7 @@ export default function EditPropertyPage() {
                 max="50"
                 value={bedrooms}
                 onChange={(e) => setBedrooms(e.target.value)}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
               />
             </div>
           </div>
@@ -197,7 +197,7 @@ export default function EditPropertyPage() {
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
             />
           </div>
 
@@ -207,7 +207,7 @@ export default function EditPropertyPage() {
               type="checkbox"
               checked={isActive}
               onChange={(e) => setIsActive(e.target.checked)}
-              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              className="h-4 w-4 rounded border-gray-300 text-brand focus:ring-brand"
             />
             <label
               htmlFor="isActive"
@@ -227,7 +227,7 @@ export default function EditPropertyPage() {
             <button
               type="submit"
               disabled={loading}
-              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+              className="rounded-btn bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-light disabled:opacity-50"
             >
               {loading ? "Saving..." : "Save changes"}
             </button>

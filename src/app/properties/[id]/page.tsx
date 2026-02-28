@@ -117,7 +117,7 @@ export default async function PropertyDetailPage({
             {role === "owner" && (
               <Link
                 href={`/properties/${id}/areas`}
-                className="text-sm font-medium text-blue-600 hover:text-blue-500"
+                className="text-sm font-medium text-brand hover:text-brand-light"
               >
                 Manage areas
               </Link>
@@ -125,12 +125,12 @@ export default async function PropertyDetailPage({
           </div>
 
           {areas.length === 0 ? (
-            <div className="rounded-lg bg-white p-8 text-center shadow-sm ring-1 ring-gray-200">
+            <div className="rounded-card bg-surface-card p-8 text-center shadow-sm ring-1 ring-surface-border">
               <p className="text-sm text-gray-500">No areas defined yet.</p>
               {role === "owner" && (
                 <Link
                   href={`/properties/${id}/areas`}
-                  className="mt-3 inline-block text-sm font-medium text-blue-600 hover:text-blue-500"
+                  className="mt-3 inline-block text-sm font-medium text-brand hover:text-brand-light"
                 >
                   Add areas like Kitchen, Bedroom 1, Bathroom...
                 </Link>
@@ -141,7 +141,7 @@ export default async function PropertyDetailPage({
               {areas.map((area, index) => (
                 <div
                   key={area.id}
-                  className="flex items-center justify-between rounded-lg bg-white px-4 py-3 shadow-sm ring-1 ring-gray-200"
+                  className="flex items-center justify-between rounded-card bg-surface-card px-4 py-3 shadow-sm ring-1 ring-surface-border"
                 >
                   <div>
                     <p className="text-sm font-medium text-gray-900">
@@ -164,14 +164,14 @@ export default async function PropertyDetailPage({
 
         {/* Sidebar stats */}
         <div className="space-y-4">
-          <div className="rounded-lg bg-white p-6 shadow-sm ring-1 ring-gray-200">
+          <div className="rounded-card bg-surface-card p-6 shadow-sm ring-1 ring-surface-border">
             <h3 className="text-sm font-medium text-gray-500">Areas</h3>
             <p className="mt-2 text-3xl font-bold text-gray-900">
               {areas.length}
             </p>
           </div>
 
-          <div className="rounded-lg bg-white p-6 shadow-sm ring-1 ring-gray-200">
+          <div className="rounded-card bg-surface-card p-6 shadow-sm ring-1 ring-surface-border">
             <h3 className="text-sm font-medium text-gray-500">Turnovers</h3>
             <p className="mt-2 text-3xl font-bold text-gray-900">
               {turnoverCount}
