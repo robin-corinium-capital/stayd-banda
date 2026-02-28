@@ -138,7 +138,7 @@ export default async function PropertyDetailPage({
             </div>
           ) : (
             <div className="space-y-2">
-              {areas.map((area) => (
+              {areas.map((area, index) => (
                 <div
                   key={area.id}
                   className="flex items-center justify-between rounded-lg bg-white px-4 py-3 shadow-sm ring-1 ring-gray-200"
@@ -154,7 +154,7 @@ export default async function PropertyDetailPage({
                     )}
                   </div>
                   <span className="text-xs text-gray-400">
-                    #{area.sortOrder}
+                    {index + 1} / {areas.length}
                   </span>
                 </div>
               ))}

@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
-import { eq, and, inArray, count } from "drizzle-orm";
+import { eq, and, inArray, count, sql } from "drizzle-orm";
 import Link from "next/link";
 
 export default async function PropertiesPage() {
@@ -16,6 +16,9 @@ export default async function PropertiesPage() {
     areaCount: number;
   })[] = [];
 
+  // Build base condition
+  let propertyCondition;
+
   if (role === "cleaner") {
     // Cleaners see only assigned properties
     const assignments = await db
@@ -23,42 +26,45 @@ export default async function PropertiesPage() {
       .from(schema.propertyAssignments)
       .where(eq(schema.propertyAssignments.userId, session.user.id));
 
-    if (assignments.length > 0) {
+    if (assignments.length === 0) {
+      // No assignments — leave propertiesList empty
+      propertyCondition = null;
+    } else {
       const propertyIds = assignments.map((a) => a.propertyId);
-      const rows = await db
-        .select()
-        .from(schema.properties)
-        .where(
-          and(
-            eq(schema.properties.orgId, orgId),
-            inArray(schema.properties.id, propertyIds)
-          )
-        )
-        .orderBy(schema.properties.name);
-
-      // Get area counts
-      for (const p of rows) {
-        const [result] = await db
-          .select({ count: count() })
-          .from(schema.areas)
-          .where(eq(schema.areas.propertyId, p.id));
-        propertiesList.push({ ...p, areaCount: result?.count ?? 0 });
-      }
+      propertyCondition = and(
+        eq(schema.properties.orgId, orgId),
+        inArray(schema.properties.id, propertyIds)
+      );
     }
   } else {
+    propertyCondition = eq(schema.properties.orgId, orgId);
+  }
+
+  if (propertyCondition) {
+    // Single query with area count subquery — avoids N+1
+    const areaCountSq = db
+      .select({
+        propertyId: schema.areas.propertyId,
+        count: count().as("area_count"),
+      })
+      .from(schema.areas)
+      .groupBy(schema.areas.propertyId)
+      .as("area_counts");
+
     const rows = await db
-      .select()
+      .select({
+        property: schema.properties,
+        areaCount: sql<number>`coalesce(${areaCountSq.count}, 0)`.mapWith(Number),
+      })
       .from(schema.properties)
-      .where(eq(schema.properties.orgId, orgId))
+      .leftJoin(areaCountSq, eq(schema.properties.id, areaCountSq.propertyId))
+      .where(propertyCondition)
       .orderBy(schema.properties.name);
 
-    for (const p of rows) {
-      const [result] = await db
-        .select({ count: count() })
-        .from(schema.areas)
-        .where(eq(schema.areas.propertyId, p.id));
-      propertiesList.push({ ...p, areaCount: result?.count ?? 0 });
-    }
+    propertiesList = rows.map((r) => ({
+      ...r.property,
+      areaCount: r.areaCount,
+    }));
   }
 
   return (

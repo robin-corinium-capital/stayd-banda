@@ -33,6 +33,10 @@ export default function ManageAreasPage() {
   const [editDescription, setEditDescription] = useState("");
   const [saving, setSaving] = useState(false);
 
+  // Delete confirmation state
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
   const fetchAreas = useCallback(async () => {
     try {
       const res = await fetch(`/api/properties/${propertyId}/areas`);
@@ -116,18 +120,19 @@ export default function ManageAreasPage() {
     setSaving(false);
   }
 
-  async function handleDelete(areaId: string, areaName: string) {
-    if (!confirm(`Delete area "${areaName}"? Any photos in this area will become unassigned.`)) {
-      return;
-    }
+  async function handleDelete() {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    setError("");
 
     try {
       const res = await fetch(
-        `/api/properties/${propertyId}/areas?areaId=${areaId}`,
+        `/api/properties/${propertyId}/areas?areaId=${deleteTarget.id}`,
         { method: "DELETE" }
       );
 
       if (res.ok) {
+        setDeleteTarget(null);
         await fetchAreas();
       } else {
         const data = await res.json();
@@ -136,6 +141,7 @@ export default function ManageAreasPage() {
     } catch {
       setError("Failed to delete area");
     }
+    setDeleting(false);
   }
 
   async function handleMoveUp(index: number) {
@@ -339,7 +345,7 @@ export default function ManageAreasPage() {
                       Edit
                     </button>
                     <button
-                      onClick={() => handleDelete(area.id, area.name)}
+                      onClick={() => setDeleteTarget({ id: area.id, name: area.name })}
                       className="rounded-md px-2 py-1 text-xs text-red-600 hover:bg-red-50"
                     >
                       Delete
@@ -363,6 +369,36 @@ export default function ManageAreasPage() {
           Done
         </button>
       </div>
+
+      {/* Delete confirmation modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Delete area
+            </h3>
+            <p className="mt-2 text-sm text-gray-600">
+              Are you sure you want to delete &ldquo;{deleteTarget.name}&rdquo;?
+              Any photos in this area will become unassigned.
+            </p>
+            <div className="mt-4 flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="rounded-md bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+              >
+                {deleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
