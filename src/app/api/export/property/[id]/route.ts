@@ -33,6 +33,20 @@ export async function GET(
     );
   }
 
+  if (isNaN(Date.parse(from)) || isNaN(Date.parse(to))) {
+    return NextResponse.json(
+      { error: "from and to must be valid dates (YYYY-MM-DD)" },
+      { status: 400 }
+    );
+  }
+
+  if (from > to) {
+    return NextResponse.json(
+      { error: "from date must not be after to date" },
+      { status: 400 }
+    );
+  }
+
   // Verify property belongs to org
   const [property] = await db
     .select()

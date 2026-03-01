@@ -3,10 +3,10 @@ export function formatDate(
   dateStr: string,
   opts?: { includeYear?: boolean },
 ): string {
-  const date = new Date(dateStr + "T00:00:00");
+  const date = new Date(dateStr + "T00:00:00Z");
   const options: Intl.DateTimeFormatOptions = { day: "numeric", month: "short" };
   if (opts?.includeYear !== false) options.year = "numeric";
-  return date.toLocaleDateString("en-GB", options);
+  return date.toLocaleDateString("en-GB", { ...options, timeZone: "UTC" });
 }
 
 /** Tailwind classes for turnover status badges. */

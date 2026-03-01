@@ -17,8 +17,10 @@ export async function GET(req: NextRequest) {
   const search = searchParams.get("search");
   const hasDamage = searchParams.get("has_damage");
   const sort = searchParams.get("sort") || "checkout_desc";
-  const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
-  const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "20", 10)));
+  const pageRaw = parseInt(searchParams.get("page") || "1", 10);
+  const page = isNaN(pageRaw) ? 1 : Math.max(1, pageRaw);
+  const limitRaw = parseInt(searchParams.get("limit") || "20", 10);
+  const limit = isNaN(limitRaw) ? 20 : Math.min(100, Math.max(1, limitRaw));
 
   // Get accessible property IDs
   let accessiblePropertyIds: string[];

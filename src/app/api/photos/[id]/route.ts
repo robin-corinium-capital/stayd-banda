@@ -55,56 +55,73 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getApiSession();
-  if (isAuthError(session)) return session;
+  try {
+    const session = await getApiSession();
+    if (isAuthError(session)) return session;
 
-  const { id } = await params;
-  const photo = await getPhotoWithAccess(id, session);
+    const { id } = await params;
+    const photo = await getPhotoWithAccess(id, session);
 
-  if (!photo) {
+    if (!photo) {
+      return NextResponse.json(
+        { error: "Photo not found" },
+        { status: 404 }
+      );
+    }
+
+    // Owner or uploader can update
+    if (!isOwner(session) && photo.uploadedBy !== session.userId) {
+      return NextResponse.json(
+        { error: "Only the owner or uploader can update this photo" },
+        { status: 403 }
+      );
+    }
+
+    let body: Record<string, unknown>;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid request body" },
+        { status: 400 }
+      );
+    }
+
+    const updates: Record<string, unknown> = {};
+
+    if (body.is_damage_flagged !== undefined) {
+      updates.isDamageFlagged = Boolean(body.is_damage_flagged);
+    }
+
+    if (body.damage_note !== undefined) {
+      updates.damageNote = (body.damage_note as string)?.trim() || null;
+    }
+
+    if (body.area_id !== undefined) {
+      updates.areaId = body.area_id || null;
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return NextResponse.json(
+        { error: "No valid fields to update" },
+        { status: 400 }
+      );
+    }
+
+    const [updated] = await db
+      .update(schema.photos)
+      .set(updates)
+      .where(eq(schema.photos.id, id))
+      .returning();
+
+    return NextResponse.json(updated);
+  } catch (error) {
+    console.error("Update photo error:", error);
     return NextResponse.json(
-      { error: "Photo not found" },
-      { status: 404 }
+      { error: "Something went wrong" },
+      { status: 500 }
     );
   }
-
-  // Owner or uploader can update
-  if (!isOwner(session) && photo.uploadedBy !== session.userId) {
-    return NextResponse.json(
-      { error: "Only the owner or uploader can update this photo" },
-      { status: 403 }
-    );
-  }
-
-  const body = await req.json();
-  const updates: Record<string, unknown> = {};
-
-  if (body.is_damage_flagged !== undefined) {
-    updates.isDamageFlagged = Boolean(body.is_damage_flagged);
-  }
-
-  if (body.damage_note !== undefined) {
-    updates.damageNote = body.damage_note?.trim() || null;
-  }
-
-  if (body.area_id !== undefined) {
-    updates.areaId = body.area_id || null;
-  }
-
-  if (Object.keys(updates).length === 0) {
-    return NextResponse.json(
-      { error: "No valid fields to update" },
-      { status: 400 }
-    );
-  }
-
-  const [updated] = await db
-    .update(schema.photos)
-    .set(updates)
-    .where(eq(schema.photos.id, id))
-    .returning();
-
-  return NextResponse.json(updated);
 }
 
 // DELETE /api/photos/[id] — owner only
@@ -112,37 +129,45 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getApiSession();
-  if (isAuthError(session)) return session;
+  try {
+    const session = await getApiSession();
+    if (isAuthError(session)) return session;
 
-  if (!isOwner(session)) {
+    if (!isOwner(session)) {
+      return NextResponse.json(
+        { error: "Only owners can delete photos" },
+        { status: 403 }
+      );
+    }
+
+    const { id } = await params;
+    const photo = await getPhotoWithAccess(id, session);
+
+    if (!photo) {
+      return NextResponse.json(
+        { error: "Photo not found" },
+        { status: 404 }
+      );
+    }
+
+    // Delete R2 objects
+    const deletePromises: Promise<void>[] = [
+      deleteObject(photo.r2KeyOriginal),
+    ];
+    if (photo.r2KeyThumbnail) {
+      deletePromises.push(deleteObject(photo.r2KeyThumbnail));
+    }
+    await Promise.allSettled(deletePromises);
+
+    // Delete database record
+    await db.delete(schema.photos).where(eq(schema.photos.id, id));
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Delete photo error:", error);
     return NextResponse.json(
-      { error: "Only owners can delete photos" },
-      { status: 403 }
+      { error: "Something went wrong" },
+      { status: 500 }
     );
   }
-
-  const { id } = await params;
-  const photo = await getPhotoWithAccess(id, session);
-
-  if (!photo) {
-    return NextResponse.json(
-      { error: "Photo not found" },
-      { status: 404 }
-    );
-  }
-
-  // Delete R2 objects
-  const deletePromises: Promise<void>[] = [
-    deleteObject(photo.r2KeyOriginal),
-  ];
-  if (photo.r2KeyThumbnail) {
-    deletePromises.push(deleteObject(photo.r2KeyThumbnail));
-  }
-  await Promise.allSettled(deletePromises);
-
-  // Delete database record
-  await db.delete(schema.photos).where(eq(schema.photos.id, id));
-
-  return NextResponse.json({ success: true });
 }
