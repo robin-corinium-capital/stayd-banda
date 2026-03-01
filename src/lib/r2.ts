@@ -15,7 +15,7 @@ const s3Client = new S3Client({
   },
 });
 
-const BUCKET = process.env.R2_BUCKET_NAME!;
+const BUCKET = process.env.R2_BUCKET_NAME!.trim();
 
 export async function getPresignedUploadUrl(
   key: string,
