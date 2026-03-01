@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 
 export default function HomePage() {
   return (
@@ -72,23 +71,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="border-t border-surface-border">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <Image
-              src="/brand/stayd-horizontal-black.svg"
-              alt="stayd"
-              width={790}
-              height={310}
-              className="h-6 w-auto"
-            />
-            <p className="text-xs text-gray-500">
-              Corinium Capital Limited
-            </p>
-          </div>
-        </div>
-      </footer>
+      {/* Footer is rendered by layout */}
     </div>
   );
 }

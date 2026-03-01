@@ -559,3 +559,180 @@ Pre-existing `ts(2469)` errors in test files only (the chainable mock's `Symbol.
 | Bugs found | 1 |
 | Bugs fixed | 1 |
 | New type errors | 0 |
+
+---
+
+# Phase 5: Export & Evidence Packs
+
+
+**Date:** 2026-03-01
+**Scope:** ZIP downloads (turnover + property bulk), PDF reports, export UI buttons
+**Commit tested:** `c36ae35` (Phase 5: Export & evidence packs)
+
+---
+
+## A. Unit Tests
+
+### Summary
+
+| Suite | File | Tests | Pass | Fail |
+|-------|------|-------|------|------|
+| A1 | `src/lib/__tests__/export-helpers.test.ts` | 10 | 10 | 0 |
+| A2 | `src/app/api/export/turnover/[id]/__tests__/turnover-zip.test.ts` | 6 | 6 | 0 |
+| A3 | `src/app/api/export/turnover/[id]/report/__tests__/report.test.ts` | 5 | 5 | 0 |
+| A4 | `src/app/api/export/property/[id]/__tests__/property-export.test.ts` | 7 | 7 | 0 |
+| **Total** | | **28** | **28** | **0** |
+
+Full suite (including phases 2–4): **70/70 pass**
+
+### A1. Export Helpers (`export-helpers.test.ts`)
+
+| # | Test | Result |
+|---|------|--------|
+| 1 | `sanitiseFilename` — normal string | PASS |
+| 2 | `sanitiseFilename` — leading/trailing special chars | PASS |
+| 3 | `sanitiseFilename` — unicode/spaces | PASS |
+| 4 | `getTurnoverWithAccess` — returns turnover for owner in same org | PASS |
+| 5 | `getTurnoverWithAccess` — returns null when not found | PASS |
+| 6 | `getTurnoverWithAccess` — returns null for wrong org | PASS |
+| 7 | `getTurnoverWithAccess` — returns null for cleaner without assignment | PASS |
+| 8 | `getTurnoverWithAccess` — returns turnover for cleaner with assignment | PASS |
+| 9 | `getTurnoverPhotos` — returns all photos | PASS |
+| 10 | `getTurnoverPhotos` — calls with flaggedOnly filter | PASS |
+
+### A2. Turnover ZIP Export (`turnover-zip.test.ts`)
+
+| # | Test | Result |
+|---|------|--------|
+| 1 | Returns 401 when unauthenticated | PASS |
+| 2 | Returns 404 when turnover not found | PASS |
+| 3 | Returns 400 when no photos to export | PASS |
+| 4 | Returns ZIP with correct Content-Disposition for all photos | PASS |
+| 5 | Returns ZIP with `_flagged` suffix when `flagged_only=true` | PASS |
+| 6 | Does not crash when a photo fails to download from R2 | PASS |
+
+### A3. PDF Report (`report.test.ts`)
+
+| # | Test | Result |
+|---|------|--------|
+| 1 | Returns 401 when unauthenticated | PASS |
+| 2 | Returns 404 when turnover not found | PASS |
+| 3 | Returns 400 when no photos to export | PASS |
+| 4 | Returns PDF with correct Content-Type and filename | PASS |
+| 5 | Renders PDF with flagged photos when they exist | PASS |
+
+### A4. Property Bulk Export (`property-export.test.ts`)
+
+| # | Test | Result |
+|---|------|--------|
+| 1 | Returns 401 when unauthenticated | PASS |
+| 2 | Returns 403 when user is not owner | PASS |
+| 3 | Returns 400 when from/to params missing | PASS |
+| 4 | Returns 404 when property not in org | PASS |
+| 5 | Returns 400 when no turnovers in date range | PASS |
+| 6 | Returns 400 when turnovers exist but no photos | PASS |
+| 7 | Returns ZIP with correct filename for valid request | PASS |
+
+### Unit Test Bugs Found & Fixed
+
+#### Bug U1: `PassThrough` mock arrow function can't be `new`'d
+
+**Files:** `turnover-zip.test.ts`, `property-export.test.ts`
+**Error:** `TypeError: () => value is not a constructor`
+**Root cause:** `vi.fn(() => mockPT)` creates an arrow function. The route code does `new PassThrough()` which requires a constructor.
+**Fix:** Changed mock to a regular function.
+
+#### Bug U2: Report test imported wrong route
+
+**File:** `report.test.ts`
+**Error:** `TypeError: Cannot read properties of undefined (reading 'searchParams')`
+**Root cause:** Import path `../../route` resolved to the ZIP route instead of the report route.
+**Fix:** Changed import to `../route`.
+
+#### Bug U3: Destructuring mismatch after PassThrough rename
+
+**File:** `turnover-zip.test.ts`
+**Error:** `ReferenceError: MockPassThroughInstance is not defined`
+**Root cause:** Destructuring still used old name after key rename.
+**Fix:** Updated destructuring to match.
+
+---
+
+## B. Browser Use-Case Tests
+
+**Target:** `https://stayd-banda.vercel.app`
+**User:** Phase2 Tester (owner role)
+**Test turnover:** Debug Test Property, 1 Mar 2026 → 2 Mar 2026, departing guest ref: P5-EXPORT-TEST
+
+### Summary
+
+| TC | Test Case | Result |
+|----|-----------|--------|
+| TC1 | Export buttons render on turnover detail | PASS |
+| TC2 | Export buttons disabled when no photos | PASS |
+| TC3 | Download ZIP | PASS |
+| TC4 | Download flagged ZIP | PASS |
+| TC5 | Download PDF report | PASS |
+| TC6 | Property export card renders | PASS |
+| TC7 | Property export button disabled without dates | PASS |
+| TC8 | Property export with valid dates | PASS |
+| TC9 | Property export with empty range | PASS |
+| TC10 | Property export not visible to cleaners | PASS (code) |
+
+**Passed: 10/10** (9 browser + 1 code-verified)
+
+### Critical Deployment Bugs Found
+
+#### Bug B1: `R2_BUCKET_NAME` has trailing newline (CRITICAL)
+
+**Impact:** All photo uploads fail on Vercel deployment
+**Root cause:** `R2_BUCKET_NAME` env var in Vercel has trailing newline, embedded into presigned URLs as `%0A`.
+**Fix applied:** `.trim()` added in `src/lib/r2.ts:18`
+**Fix required:** Also cleaned Vercel dashboard env var.
+
+#### Bug B2: R2 CORS missing Vercel origin (CRITICAL)
+
+**Impact:** All photo uploads from `stayd-banda.vercel.app` blocked by CORS
+**Root cause:** R2 bucket CORS only allowed `banda.stayd-tools.com` and `localhost:3000`.
+**Fix:** Added `https://stayd-banda.vercel.app` to R2 bucket CORS configuration.
+
+---
+
+## C. Fixes Applied
+
+| # | Type | File | Description |
+|---|------|------|-------------|
+| 1 | Code fix | `src/lib/r2.ts:18` | Added `.trim()` to `R2_BUCKET_NAME` to prevent trailing whitespace/newlines from corrupting presigned URLs |
+
+## D. Outstanding Issues
+
+| # | Severity | Issue | Status |
+|---|----------|-------|--------|
+| 1 | ~~CRITICAL~~ | R2 CORS missing Vercel origin | **RESOLVED** |
+| 2 | ~~CRITICAL~~ | R2 env vars have trailing newlines | **RESOLVED** |
+| 3 | LOW | Export error feedback uses `alert()` | Open |
+
+## E. Test Artifacts
+
+### Test files created
+- `src/lib/__tests__/export-helpers.test.ts` — 10 tests
+- `src/app/api/export/turnover/[id]/__tests__/turnover-zip.test.ts` — 6 tests
+- `src/app/api/export/turnover/[id]/report/__tests__/report.test.ts` — 5 tests
+- `src/app/api/export/property/[id]/__tests__/property-export.test.ts` — 7 tests
+
+### Vitest run output
+```
+ ✓ src/lib/__tests__/r2.test.ts (5 tests) 3ms
+ ✓ src/app/api/export/turnover/[id]/__tests__/turnover-zip.test.ts (6 tests) 9ms
+ ✓ src/app/api/photos/__tests__/confirm.test.ts (11 tests) 12ms
+ ✓ src/lib/__tests__/export-helpers.test.ts (10 tests) 15ms
+ ✓ src/app/api/export/property/[id]/__tests__/property-export.test.ts (7 tests) 14ms
+ ✓ src/app/api/turnovers/__tests__/turnovers.test.ts (8 tests) 8ms
+ ✓ src/app/api/photos/__tests__/presign.test.ts (8 tests) 10ms
+ ✓ src/app/api/export/turnover/[id]/report/__tests__/report.test.ts (5 tests) 30ms
+ ✓ src/app/api/turnovers/__tests__/turnover-detail.test.ts (10 tests) 9ms
+
+ Test Files  9 passed (9)
+      Tests  70 passed (70)
+   Duration  426ms
+```

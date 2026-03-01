@@ -46,6 +46,42 @@ export function verificationEmailHtml(verifyUrl: string) {
   `;
 }
 
+export function retentionWarningEmailHtml({
+  propertyName,
+  checkoutDate,
+  checkinDate,
+  photoCount,
+  downloadUrl,
+  extendUrl,
+}: {
+  propertyName: string;
+  checkoutDate: string;
+  checkinDate: string;
+  photoCount: number;
+  downloadUrl: string;
+  extendUrl: string;
+}) {
+  return `
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2>Turnover evidence expiring soon</h2>
+      <p>The following turnover evidence will be automatically deleted in 30 days:</p>
+      <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+        <tr><td style="padding: 8px 0; color: #6b7280;">Property</td><td style="padding: 8px 0; font-weight: bold;">${propertyName}</td></tr>
+        <tr><td style="padding: 8px 0; color: #6b7280;">Checkout</td><td style="padding: 8px 0;">${checkoutDate}</td></tr>
+        <tr><td style="padding: 8px 0; color: #6b7280;">Check-in</td><td style="padding: 8px 0;">${checkinDate}</td></tr>
+        <tr><td style="padding: 8px 0; color: #6b7280;">Photos</td><td style="padding: 8px 0;">${photoCount} photo${photoCount !== 1 ? "s" : ""}</td></tr>
+      </table>
+      <p>
+        <a href="${downloadUrl}" style="display: inline-block; padding: 12px 24px; background-color: #00402E; color: white; text-decoration: none; border-radius: 6px; margin-right: 12px;">Download evidence pack</a>
+        <a href="${extendUrl}" style="display: inline-block; padding: 12px 24px; background-color: #ffa726; color: white; text-decoration: none; border-radius: 6px;">Extend retention</a>
+      </p>
+      <p style="color: #6b7280; font-size: 14px; margin-top: 24px;">If you no longer need this evidence, no action is required. The data will be deleted after 12 months.</p>
+      <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+      <p style="color: #9ca3af; font-size: 12px;">banda by stayd &mdash; turnover photo documentation</p>
+    </div>
+  `;
+}
+
 export function passwordResetEmailHtml(resetUrl: string) {
   return `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">

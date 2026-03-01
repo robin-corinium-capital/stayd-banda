@@ -2,9 +2,10 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
-import { eq, and, count } from "drizzle-orm";
+import { eq, and, count, sql, isNull } from "drizzle-orm";
 import Link from "next/link";
 import { FlaggedItemsSection } from "./flagged-items";
+import { RetentionBanner } from "./retention-banner";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -71,8 +72,56 @@ export default async function DashboardPage() {
     flaggedCount = result?.count ?? 0;
   }
 
+  // Find turnovers expiring in the next 30 days (11-12 months old)
+  let expiringTurnovers: {
+    id: string;
+    propertyName: string;
+    checkoutDate: string;
+    completedAt: Date | null;
+  }[] = [];
+  if (orgId && role === "owner") {
+    expiringTurnovers = await db
+      .select({
+        id: schema.turnovers.id,
+        propertyName: schema.properties.name,
+        checkoutDate: schema.turnovers.checkoutDate,
+        completedAt: schema.turnovers.completedAt,
+      })
+      .from(schema.turnovers)
+      .innerJoin(
+        schema.properties,
+        eq(schema.turnovers.propertyId, schema.properties.id)
+      )
+      .where(
+        and(
+          eq(schema.properties.orgId, orgId),
+          eq(schema.turnovers.status, "complete"),
+          eq(schema.turnovers.retentionExtended, false),
+          sql`${schema.turnovers.completedAt} < NOW() - INTERVAL '11 months'`,
+          sql`${schema.turnovers.completedAt} >= NOW() - INTERVAL '12 months'`
+        )
+      );
+
+    // Send retention notification emails for those not yet notified
+    if (expiringTurnovers.length > 0) {
+      // Trigger notification check (fire and forget)
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "";
+      if (baseUrl) {
+        fetch(`${baseUrl}/api/retention/notify`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orgId }),
+        }).catch(() => {});
+      }
+    }
+  }
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      {expiringTurnovers.length > 0 && (
+        <RetentionBanner turnovers={expiringTurnovers} />
+      )}
+
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
         <p className="mt-1 text-sm text-gray-600">Welcome to {orgName}</p>

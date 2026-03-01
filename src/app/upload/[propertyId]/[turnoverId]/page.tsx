@@ -267,6 +267,22 @@ export default function UploadTurnoverPage() {
     );
   }
 
+  if (turnover.status === "complete") {
+    return (
+      <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="rounded-md bg-amber-50 p-4 text-sm text-amber-700">
+          This turnover is complete. Create a new turnover to upload photos.
+        </div>
+        <Link
+          href={`/turnovers/${turnoverId}`}
+          className="mt-4 inline-block text-sm text-brand hover:text-brand-light"
+        >
+          &larr; Back to turnover
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
       {/* Header */}
@@ -296,9 +312,9 @@ export default function UploadTurnoverPage() {
             <button
               type="button"
               onClick={() => setPhotoSet("post_checkout")}
-              className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+              className={`rounded-md px-3 py-3.5 text-sm font-medium transition-colors min-h-[56px] ${
                 photoSet === "post_checkout"
-                  ? "bg-amber-100 text-amber-900 ring-1 ring-amber-300"
+                  ? "bg-amber-100 text-amber-900 ring-2 ring-amber-300"
                   : "bg-gray-50 text-gray-600 hover:bg-gray-100"
               }`}
             >
@@ -307,9 +323,9 @@ export default function UploadTurnoverPage() {
             <button
               type="button"
               onClick={() => setPhotoSet("pre_checkin")}
-              className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+              className={`rounded-md px-3 py-3.5 text-sm font-medium transition-colors min-h-[56px] ${
                 photoSet === "pre_checkin"
-                  ? "bg-green-100 text-green-900 ring-1 ring-green-300"
+                  ? "bg-green-100 text-green-900 ring-2 ring-green-300"
                   : "bg-gray-50 text-gray-600 hover:bg-gray-100"
               }`}
             >
@@ -347,10 +363,10 @@ export default function UploadTurnoverPage() {
       <div className="mb-6">
         <label
           htmlFor="fileInput"
-          className="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white p-8 text-center hover:border-brand/40 hover:bg-brand-dim transition-colors"
+          className="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white p-8 text-center hover:border-brand/40 hover:bg-brand-dim transition-colors min-h-[120px]"
         >
           <svg
-            className="mb-3 h-10 w-10 text-gray-400"
+            className="mb-3 h-16 w-16 text-gray-400"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

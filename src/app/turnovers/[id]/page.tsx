@@ -7,6 +7,7 @@ import Link from "next/link";
 import { TurnoverActions, MarkCompleteButton } from "./turnover-actions";
 import { PhotoSections } from "./photo-sections";
 import { ExportButtons } from "./export-buttons";
+import { RetentionSection } from "./retention-section";
 
 export default async function TurnoverDetailPage({
   params,
@@ -32,6 +33,7 @@ export default async function TurnoverDetailPage({
       status: schema.turnovers.status,
       createdAt: schema.turnovers.createdAt,
       completedAt: schema.turnovers.completedAt,
+      retentionExtended: schema.turnovers.retentionExtended,
       propertyName: schema.properties.name,
       propertyOrgId: schema.properties.orgId,
     })
@@ -105,43 +107,41 @@ export default async function TurnoverDetailPage({
           &larr; Back to turnovers
         </Link>
 
-        <div className="mt-4 flex items-start justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              <Link
-                href={`/properties/${turnover.propertyId}`}
-                className="hover:text-brand hover:underline"
-              >
-                {turnover.propertyName}
-              </Link>
-            </h1>
-            <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-gray-600">
-              <span>
-                Checkout: {formatDate(turnover.checkoutDate)}
-              </span>
-              <span>
-                Check-in: {formatDate(turnover.checkinDate)}
-              </span>
-              <span
-                className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                  statusColour[turnover.status || "open"]
-                }`}
-              >
-                {statusLabel[turnover.status || "open"]}
-              </span>
-            </div>
-            {turnover.departingGuestRef && (
-              <p className="mt-1 text-xs text-gray-500">
-                Departing: {turnover.departingGuestRef}
-              </p>
-            )}
-            {turnover.arrivingGuestRef && (
-              <p className="text-xs text-gray-500">
-                Arriving: {turnover.arrivingGuestRef}
-              </p>
-            )}
+        <div className="mt-4">
+          <h1 className="text-2xl font-bold text-gray-900">
+            <Link
+              href={`/properties/${turnover.propertyId}`}
+              className="hover:text-brand hover:underline"
+            >
+              {turnover.propertyName}
+            </Link>
+          </h1>
+          <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-gray-600">
+            <span>
+              Checkout: {formatDate(turnover.checkoutDate)}
+            </span>
+            <span>
+              Check-in: {formatDate(turnover.checkinDate)}
+            </span>
+            <span
+              className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
+                statusColour[turnover.status || "open"]
+              }`}
+            >
+              {statusLabel[turnover.status || "open"]}
+            </span>
           </div>
-          <div className="flex items-center gap-2">
+          {turnover.departingGuestRef && (
+            <p className="mt-1 text-xs text-gray-500">
+              Departing: {turnover.departingGuestRef}
+            </p>
+          )}
+          {turnover.arrivingGuestRef && (
+            <p className="text-xs text-gray-500">
+              Arriving: {turnover.arrivingGuestRef}
+            </p>
+          )}
+          <div className="mt-4 flex flex-wrap items-center gap-2">
             {turnover.status !== "complete" && role === "owner" && (
               <MarkCompleteButton turnoverId={id} />
             )}
@@ -200,6 +200,15 @@ export default async function TurnoverDetailPage({
           <p className="text-xs text-red-600">damage flags</p>
         </div>
       </div>
+
+      {/* Retention section - owner only, completed turnovers */}
+      {turnover.status === "complete" && role === "owner" && (
+        <RetentionSection
+          turnoverId={id}
+          completedAt={turnover.completedAt}
+          retentionExtended={turnover.retentionExtended ?? false}
+        />
+      )}
 
       {/* Photo sections */}
       {photos.length === 0 ? (
