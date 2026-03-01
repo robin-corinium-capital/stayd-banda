@@ -3,6 +3,9 @@ import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "@/components/session-provider";
 import { Nav } from "@/components/nav";
+import { Footer } from "@/components/footer";
+import { ToastProvider } from "@/components/ui/toast";
+import { OnboardingTour } from "@/components/onboarding-tour";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -40,8 +43,12 @@ export default function RootLayout({
     <html lang="en" className={`${jakarta.variable} ${jetbrains.variable}`}>
       <body className="font-sans bg-surface min-h-screen">
         <SessionProvider>
-          <Nav />
-          <main>{children}</main>
+          <ToastProvider>
+            <Nav />
+            <OnboardingTour />
+            <main className="min-h-[calc(100vh-8rem)]">{children}</main>
+            <Footer />
+          </ToastProvider>
         </SessionProvider>
       </body>
     </html>

@@ -30,16 +30,16 @@ export function Nav() {
           <div className="hidden md:flex md:items-center md:gap-6">
             {session ? (
               <>
-                <Link href="/dashboard" className="text-sm text-gray-600 hover:text-gray-900">
+                <Link href="/dashboard" data-tour="dashboard" className="text-sm text-gray-600 hover:text-gray-900">
                   Dashboard
                 </Link>
-                <Link href="/properties" className="text-sm text-gray-600 hover:text-gray-900">
+                <Link href="/properties" data-tour="properties" className="text-sm text-gray-600 hover:text-gray-900">
                   Properties
                 </Link>
-                <Link href="/turnovers" className="text-sm text-gray-600 hover:text-gray-900">
+                <Link href="/turnovers" data-tour="turnovers" className="text-sm text-gray-600 hover:text-gray-900">
                   Turnovers
                 </Link>
-                <Link href="/help" className="text-sm text-gray-600 hover:text-gray-900">
+                <Link href="/help" data-tour="help" className="text-sm text-gray-600 hover:text-gray-900">
                   Help
                 </Link>
                 {session.user.role === "cleaner" && (
