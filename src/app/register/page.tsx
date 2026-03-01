@@ -2,15 +2,18 @@
 
 import { signIn } from "next-auth/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, Suspense } from "react";
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -44,7 +47,7 @@ export default function RegisterPage() {
         // Registration succeeded but sign-in failed — redirect to login
         router.push("/login");
       } else {
-        router.push("/dashboard");
+        router.push(callbackUrl);
         router.refresh();
       }
     } catch {
@@ -65,7 +68,7 @@ export default function RegisterPage() {
 
         <div className="rounded-card bg-surface-card p-8 shadow-sm ring-1 ring-surface-border">
           <button
-            onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+            onClick={() => signIn("google", { callbackUrl })}
             className="flex w-full items-center justify-center gap-3 rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -145,9 +148,25 @@ export default function RegisterPage() {
               <p className="mt-1 text-xs text-gray-500">Minimum 8 characters</p>
             </div>
 
+            <div className="flex items-start gap-2">
+              <input
+                id="terms"
+                type="checkbox"
+                checked={agreedToTerms}
+                onChange={(e) => setAgreedToTerms(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-gray-300 text-brand focus:ring-brand"
+              />
+              <label htmlFor="terms" className="text-sm text-gray-600">
+                I agree to the{" "}
+                <Link href="/terms" className="font-medium text-brand hover:text-brand-light" target="_blank">
+                  Terms of Use
+                </Link>
+              </label>
+            </div>
+
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !agreedToTerms}
               className="w-full rounded-btn bg-brand px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-light disabled:opacity-50"
             >
               {loading ? "Creating account..." : "Create account"}
@@ -163,5 +182,13 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense>
+      <RegisterForm />
+    </Suspense>
   );
 }
