@@ -6,6 +6,7 @@ import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { ToastProvider } from "@/components/ui/toast";
 import { OnboardingTour } from "@/components/onboarding-tour";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -46,7 +47,9 @@ export default function RootLayout({
           <ToastProvider>
             <Nav />
             <OnboardingTour />
-            <main className="min-h-[calc(100vh-8rem)]">{children}</main>
+            <main className="min-h-[calc(100vh-8rem)]">
+              <ErrorBoundary>{children}</ErrorBoundary>
+            </main>
             <Footer />
           </ToastProvider>
         </SessionProvider>

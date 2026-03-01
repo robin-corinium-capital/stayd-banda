@@ -25,6 +25,9 @@ vi.mock("@/lib/email", () => ({
   sendEmail: mockSendEmail,
   passwordResetEmailHtml: (url: string) => `<a href="${url}">Reset</a>`,
 }));
+vi.mock("@/lib/rate-limit", () => ({
+  rateLimit: () => ({ check: () => ({ success: true, remaining: 99 }) }),
+}));
 
 import { POST } from "../forgot-password/route";
 import { NextRequest } from "next/server";
