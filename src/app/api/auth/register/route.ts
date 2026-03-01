@@ -3,9 +3,21 @@ import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
+import { rateLimit } from "@/lib/rate-limit";
+
+const limiter = rateLimit({ interval: 15 * 60 * 1000, maxRequests: 5 });
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+    const { success } = limiter.check(ip);
+    if (!success) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const { email, password, name } = await request.json();
 
     // Validate input

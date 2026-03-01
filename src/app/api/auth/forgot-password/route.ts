@@ -4,9 +4,21 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { sendEmail, passwordResetEmailHtml } from "@/lib/email";
+import { rateLimit } from "@/lib/rate-limit";
+
+const limiter = rateLimit({ interval: 15 * 60 * 1000, maxRequests: 3 });
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+    const { success } = limiter.check(ip);
+    if (!success) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const { email } = await request.json();
 
     if (!email) {
