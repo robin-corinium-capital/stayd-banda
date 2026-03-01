@@ -113,6 +113,12 @@ function LoginForm() {
               />
             </div>
 
+            <div className="text-right">
+              <Link href="/forgot-password" className="text-xs text-brand hover:text-brand-light">
+                Forgot password?
+              </Link>
+            </div>
+
             <button
               type="submit"
               disabled={loading}
