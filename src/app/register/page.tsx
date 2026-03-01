@@ -161,6 +161,10 @@ function RegisterForm() {
                 <Link href="/terms" className="font-medium text-brand hover:text-brand-light" target="_blank">
                   Terms of Use
                 </Link>
+                {" "}and{" "}
+                <Link href="/privacy" className="font-medium text-brand hover:text-brand-light" target="_blank">
+                  Privacy Policy
+                </Link>
               </label>
             </div>
 
