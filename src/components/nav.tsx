@@ -39,6 +39,9 @@ export function Nav() {
                 <Link href="/turnovers" className="text-sm text-gray-600 hover:text-gray-900">
                   Turnovers
                 </Link>
+                <Link href="/help" className="text-sm text-gray-600 hover:text-gray-900">
+                  Help
+                </Link>
                 {session.user.role === "cleaner" && (
                   <Link href="/upload" className="text-sm text-gray-600 hover:text-gray-900">
                     Upload
@@ -110,36 +113,39 @@ export function Nav() {
           <div className="border-t border-surface-border pb-4 md:hidden">
             {session ? (
               <div className="space-y-1 pt-2">
-                <Link href="/dashboard" className="block px-3 py-2 text-sm text-gray-600 hover:bg-surface" onClick={() => setMobileOpen(false)}>
+                <Link href="/dashboard" className="block px-3 py-3 text-base text-gray-600 hover:bg-surface min-h-[44px]" onClick={() => setMobileOpen(false)}>
                   Dashboard
                 </Link>
-                <Link href="/properties" className="block px-3 py-2 text-sm text-gray-600 hover:bg-surface" onClick={() => setMobileOpen(false)}>
+                <Link href="/properties" className="block px-3 py-3 text-base text-gray-600 hover:bg-surface min-h-[44px]" onClick={() => setMobileOpen(false)}>
                   Properties
                 </Link>
-                <Link href="/turnovers" className="block px-3 py-2 text-sm text-gray-600 hover:bg-surface" onClick={() => setMobileOpen(false)}>
+                <Link href="/turnovers" className="block px-3 py-3 text-base text-gray-600 hover:bg-surface min-h-[44px]" onClick={() => setMobileOpen(false)}>
                   Turnovers
                 </Link>
+                <Link href="/help" className="block px-3 py-3 text-base text-gray-600 hover:bg-surface min-h-[44px]" onClick={() => setMobileOpen(false)}>
+                  Help
+                </Link>
                 {session.user.role === "cleaner" && (
-                  <Link href="/upload" className="block px-3 py-2 text-sm text-gray-600 hover:bg-surface" onClick={() => setMobileOpen(false)}>
+                  <Link href="/upload" className="block px-3 py-3 text-base text-gray-600 hover:bg-surface min-h-[44px]" onClick={() => setMobileOpen(false)}>
                     Upload
                   </Link>
                 )}
-                <Link href="/settings" className="block px-3 py-2 text-sm text-gray-600 hover:bg-surface" onClick={() => setMobileOpen(false)}>
+                <Link href="/settings" className="block px-3 py-3 text-base text-gray-600 hover:bg-surface min-h-[44px]" onClick={() => setMobileOpen(false)}>
                   Settings
                 </Link>
                 <button
                   onClick={() => signOut({ callbackUrl: "/" })}
-                  className="block w-full px-3 py-2 text-left text-sm text-gray-600 hover:bg-surface"
+                  className="block w-full px-3 py-3 text-left text-base text-gray-600 hover:bg-surface min-h-[44px]"
                 >
                   Sign out
                 </button>
               </div>
             ) : (
               <div className="space-y-1 pt-2">
-                <Link href="/login" className="block px-3 py-2 text-sm text-gray-600 hover:bg-surface" onClick={() => setMobileOpen(false)}>
+                <Link href="/login" className="block px-3 py-3 text-base text-gray-600 hover:bg-surface min-h-[44px]" onClick={() => setMobileOpen(false)}>
                   Login
                 </Link>
-                <Link href="/register" className="block px-3 py-2 text-sm text-gray-600 hover:bg-surface" onClick={() => setMobileOpen(false)}>
+                <Link href="/register" className="block px-3 py-3 text-base text-gray-600 hover:bg-surface min-h-[44px]" onClick={() => setMobileOpen(false)}>
                   Register
                 </Link>
               </div>
