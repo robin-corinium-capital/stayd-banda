@@ -110,18 +110,18 @@ vi.mock("stream", () => ({
 
 | TC | Test Case | Result | Notes |
 |----|-----------|--------|-------|
-| TC1 | Export buttons render on turnover detail | PARTIAL | Buttons render correctly; full test blocked — no photos uploadable |
+| TC1 | Export buttons render on turnover detail | **PASS** | All buttons render: Download ZIP, Download flagged (when flagged photos exist), Download report |
 | TC2 | Export buttons disabled when no photos | **PASS** | "Download ZIP" and "Download report" grayed/disabled; "Download flagged" hidden |
-| TC3 | Download ZIP | BLOCKED | Requires photos; upload broken (see Bug B1, B2) |
-| TC4 | Download flagged ZIP | BLOCKED | Requires flagged photos |
-| TC5 | Download PDF report | BLOCKED | Requires photos |
+| TC3 | Download ZIP | **PASS** | API returned 200, `.zip` file downloaded (1 photo) |
+| TC4 | Download flagged ZIP | **PASS** | API hit `?flagged_only=true`, returned 200, ZIP downloaded with flagged subset |
+| TC5 | Download PDF report | **PASS** | `/report` endpoint returned 200, `.pdf` downloaded |
 | TC6 | Property export card renders | **PASS** | "Export" card visible with From/To date inputs and "Download all turnovers" button |
 | TC7 | Property export button disabled without dates | **PASS** | Button is `disabled: true` with `cursor-not-allowed` class |
-| TC8 | Property export with valid dates | PARTIAL | With turnovers but 0 photos → correctly shows "No photos to export" error; full download test blocked |
+| TC8 | Property export with valid dates | **PASS** | `?from=2026-03-01&to=2026-03-31` returned 200, ZIP downloaded |
 | TC9 | Property export with empty range | **PASS** | Error alert: "No turnovers in date range" |
-| TC10 | Property export not visible to cleaners | SKIPPED | Would require separate cleaner login |
+| TC10 | Property export not visible to cleaners | **PASS (code)** | Verified via code: `page.tsx:185` guards with `role === "owner"`. Unit test A4#2 confirms API returns 403 for non-owner. No cleaner browser account available. |
 
-**Passed: 4 | Partial: 2 | Blocked: 3 | Skipped: 1**
+**Passed: 10/10** (9 browser + 1 code-verified)
 
 ### Critical Deployment Bugs Found
 
@@ -173,6 +173,32 @@ The Vercel deployment origin `https://stayd-banda.vercel.app` is not in the allo
 
 ### Browser Test Details
 
+**TC1 — Export buttons render on turnover detail (with photos):**
+- Navigated to turnover detail page (1 photo, 1 flagged)
+- "Download ZIP" button: active, dark outline style
+- "Download flagged" button: active, red/pink styling (only shown because flagged count > 0)
+- "Download report" button: active, dark outline style
+- "Upload photos" button: active (dark green)
+- FLAGGED stat card correctly shows "1 damage flags"
+
+**TC3 — Download ZIP:**
+- Clicked "Download ZIP" on turnover with 1 photo
+- Network: `GET /api/export/turnover/{id}` → 200
+- File downloaded as `.zip` (too fast for spinner with 1 photo)
+
+**TC4 — Download flagged ZIP:**
+- Flagged the test photo as damaged via photo viewer → "Flag damage" button
+- PATCH `/api/photos/{id}` returned 200, button changed to red "Flagged" state
+- Refreshed page — "Download flagged" button appeared, FLAGGED counter updated to 1
+- Clicked "Download flagged"
+- Network: `GET /api/export/turnover/{id}?flagged_only=true` → 200
+- File downloaded as `.zip`
+
+**TC5 — Download PDF report:**
+- Clicked "Download report" on turnover with 1 photo (1 flagged)
+- Network: `GET /api/export/turnover/{id}/report` → 200
+- PDF file downloaded
+
 **TC2 — Export buttons disabled when no photos:**
 - Navigated to turnover detail page (0 photos)
 - "Download ZIP" button: visible, grayed out, `border-gray-300 text-gray-400 cursor-not-allowed`
@@ -198,11 +224,17 @@ The Vercel deployment origin `https://stayd-banda.vercel.app` is not in the allo
 - Clicked "Download all turnovers"
 - Alert captured: "No turnovers in date range"
 
-**TC8 (partial) — Valid date range, no photos:**
-- Set dates: From 01/03/2026 To 31/03/2026 (covers our test turnover)
+**TC8 — Property export with valid dates:**
+- Set dates: From 01/03/2026 To 31/03/2026 (covers test turnover with 1 photo)
 - Clicked "Download all turnovers"
-- Alert captured: "No photos to export"
-- Confirms API correctly finds turnovers but rejects when zero photos
+- Network: `GET /api/export/property/{id}?from=2026-03-01&to=2026-03-31` → 200
+- ZIP file downloaded
+
+**TC10 — Property export not visible to cleaners (code-verified):**
+- `src/app/properties/[id]/page.tsx:185`: `{role === "owner" && turnoverCount > 0 && (<PropertyExport .../>)}`
+- Component only rendered when session role is "owner"
+- Unit test A4#2 confirms API returns 403 for non-owner users
+- No cleaner browser account available for live test — verified via code + unit test
 
 ---
 
@@ -214,11 +246,11 @@ The Vercel deployment origin `https://stayd-banda.vercel.app` is not in the allo
 
 ## D. Outstanding Issues
 
-| # | Severity | Issue | Action Required |
-|---|----------|-------|-----------------|
-| 1 | CRITICAL | R2 CORS missing `https://stayd-banda.vercel.app` origin | Add origin to R2 bucket CORS config in Cloudflare dashboard |
-| 2 | CRITICAL | `R2_BUCKET_NAME` env var has trailing newline in Vercel | Clean up the env var value in Vercel dashboard (code-level `.trim()` fix also applied) |
-| 3 | LOW | Export error feedback uses `alert()` | Consider replacing with inline toast/banner for better UX |
+| # | Severity | Issue | Status |
+|---|----------|-------|--------|
+| 1 | ~~CRITICAL~~ | R2 CORS missing Vercel origin | **RESOLVED** — CORS set via `PutBucketCors` on EU endpoint (see `r2-presigned-url-corruption-rca.md`) |
+| 2 | ~~CRITICAL~~ | R2 env vars have trailing newlines | **RESOLVED** — `.trim()` in code (commit `7eeaa30`) + cleaned Vercel dashboard |
+| 3 | LOW | Export error feedback uses `alert()` | Open — consider replacing with inline toast/banner for better UX |
 
 ## E. Test Artifacts
 
@@ -232,7 +264,7 @@ The Vercel deployment origin `https://stayd-banda.vercel.app` is not in the allo
 - Property: "Debug Test Property" (`26d14c23-aa59-40a6-b48b-7ca5607033a6`)
 - Turnover: 1 Mar → 2 Mar 2026 (`d64d34e0-44f2-4c22-97ec-abef5e47d67b`)
 - Departing guest ref: P5-EXPORT-TEST
-- Photos: 0 (upload blocked by bugs B1 + B2)
+- Photos: 1 (post-checkout, General area, flagged as damaged)
 
 ### Vitest run output
 ```
