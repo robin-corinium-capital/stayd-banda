@@ -39,8 +39,18 @@ export function FlaggedItemsSection() {
     return (
       <div className="mt-8">
         <h2 className="mb-4 text-lg font-semibold text-gray-900">Recent Flagged Items</h2>
-        <div className="flex justify-center py-8">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-brand" />
+        <div className="space-y-3">
+          {[...Array(2)].map((_, i) => (
+            <div key={i} className="animate-pulse rounded-card bg-surface-card p-4 shadow-sm ring-1 ring-surface-border">
+              <div className="flex gap-4">
+                <div className="h-16 w-16 shrink-0 rounded bg-gray-200" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 w-1/3 rounded bg-gray-200" />
+                  <div className="h-3 w-1/2 rounded bg-gray-200" />
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );
