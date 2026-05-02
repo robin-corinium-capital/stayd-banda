@@ -4,15 +4,23 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:op": "op run --env-file=.env.local -- next dev",
     "build": "next build",
+    "build:op": "op run --env-file=.env.local -- next build",
     "start": "next start",
+    "start:op": "op run --env-file=.env.local -- next start",
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "vitest run src/__tests__/e2e/",
     "db:generate": "drizzle-kit generate",
+    "db:generate:op": "op run --env-file=.env.local -- drizzle-kit generate",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:push:op": "op run --env-file=.env.local -- drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "db:studio:op": "op run --env-file=.env.local -- drizzle-kit studio",
+    "test:browser": "playwright test --project=desktop-chrome",
+    "test:browser:ui": "playwright test --ui"
   },
   "dependencies": {
     "@auth/core": "^0.41.0",
@@ -32,6 +40,7 @@
     "sharp": "^0.34.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
     "@types/archiver": "^7.0.0",
     "@types/bcryptjs": "^2.4.6",

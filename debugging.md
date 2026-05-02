@@ -736,3 +736,65 @@ Full suite (including phases 2–4): **70/70 pass**
       Tests  70 passed (70)
    Duration  426ms
 ```
+
+---
+
+# Code Audit & Cleanup (Post-Phase 5)
+
+
+**Date:** 2026-03-01
+**Scope:** Deduplication, query optimisation, accessibility fixes — zero breaking changes
+
+---
+
+## Changes Made
+
+### 1. Shared Utilities — `src/lib/format.ts` (NEW)
+
+Extracted duplicated code into a single shared module:
+
+- **`formatDate(dateStr, opts?)`** — replaced 6 duplicate copies across 5 files. Supports `{ includeYear: false }` for compact format used in `flagged-items.tsx` and `upload/page.tsx`.
+- **`STATUS_COLOUR`** / **`STATUS_LABEL`** — maps previously defined inline in `turnovers/[id]/page.tsx` and `turnovers-list.tsx`.
+
+**Files updated:**
+- `src/app/turnovers/[id]/page.tsx` — removed local `formatDate`, `statusColour`, `statusLabel`
+- `src/app/turnovers/turnovers-list.tsx` — removed local `formatDate`, status maps
+- `src/app/upload/page.tsx` — removed local `formatDate`
+- `src/app/upload/[propertyId]/[turnoverId]/page.tsx` — removed local `formatDate`
+- `src/app/dashboard/flagged-items.tsx` — removed local `formatDate`
+
+### 2. Shared Google OAuth Button — `src/components/google-sign-in-button.tsx` (NEW)
+
+Extracted identical ~40-line Google SVG + sign-in button from login and register pages into a shared component.
+
+**Files updated:**
+- `src/app/login/page.tsx` — uses `<GoogleSignInButton label="Sign in with Google" />`
+- `src/app/register/page.tsx` — uses `<GoogleSignInButton label="Sign up with Google" />`
+
+### 3. Nav Link Deduplication — `src/components/nav.tsx`
+
+Desktop and mobile nav links were defined as separate static lists. Consolidated into a single mapped array for both sections, reducing duplication from ~30 lines to ~10.
+
+### 4. SQL Query Optimisation — `src/app/api/settings/team/route.ts`
+
+Two JS-side filters moved into SQL WHERE clauses:
+
+- **Property assignments:** Was fetching all org assignments then `.filter()` by `cleanerIds` in JS. Now uses `inArray(schema.propertyAssignments.userId, cleanerIds)` in the query.
+- **Pending invites:** Was fetching all org invites then filtering expired/used in JS. Now uses `isNull(schema.invites.usedAt)` and `gt(schema.invites.expiresAt, new Date())` in the query.
+
+### 5. Accessibility Fixes
+
+| File | Fix |
+|------|-----|
+| `src/components/ui/card.tsx` | Added `onKeyDown` handler (Enter/Space) for interactive cards that had `role="button"` but no keyboard activation |
+| `src/components/nav.tsx` | Added `aria-label` to hamburger menu button |
+| `src/components/ui/toast.tsx` | Added `role="alert"` for screen reader announcements, `aria-label="Dismiss"` on close button |
+
+---
+
+## Verification
+
+- `npm run build` — zero errors
+- Visual verification via preview: login page, register page render correctly with shared Google button
+- `aria-label="Open menu"` confirmed on hamburger button
+- No new dependencies, no schema changes, no migration required

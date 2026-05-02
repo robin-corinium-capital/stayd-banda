@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { eq, and } from "drizzle-orm";
+import { eq, and, inArray, isNull, gt } from "drizzle-orm";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { getApiSession, isAuthError, isOwner } from "@/lib/auth-helpers";
@@ -35,7 +35,7 @@ export async function GET() {
 
     let assignments: { userId: string; propertyName: string }[] = [];
     if (cleanerIds.length > 0) {
-      const allAssignments = await db
+      assignments = await db
         .select({
           userId: schema.propertyAssignments.userId,
           propertyName: schema.properties.name,
@@ -45,26 +45,25 @@ export async function GET() {
           schema.properties,
           eq(schema.propertyAssignments.propertyId, schema.properties.id)
         )
-        .where(eq(schema.properties.orgId, session.orgId));
-
-      assignments = allAssignments.filter((a) =>
-        cleanerIds.includes(a.userId)
-      );
+        .where(
+          and(
+            eq(schema.properties.orgId, session.orgId),
+            inArray(schema.propertyAssignments.userId, cleanerIds)
+          )
+        );
     }
 
-    // Get pending invites
-    const pendingInvites = await db
+    // Get pending invites (unused and not expired)
+    const pending = await db
       .select()
       .from(schema.invites)
       .where(
         and(
           eq(schema.invites.orgId, session.orgId),
+          isNull(schema.invites.usedAt),
+          gt(schema.invites.expiresAt, new Date())
         )
       );
-
-    const pending = pendingInvites.filter(
-      (inv) => !inv.usedAt && new Date(inv.expiresAt) > new Date()
-    );
 
     return NextResponse.json({
       members: members.map((m) => ({

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { formatDate } from "@/lib/format";
 
 type FlaggedPhoto = {
   photoId: string;
@@ -102,7 +103,7 @@ export function FlaggedItemsSection() {
               <p className="text-sm font-medium text-gray-900">{item.propertyName}</p>
               <p className="text-xs text-gray-500">{item.areaName || "General"}</p>
               <p className="text-xs text-gray-500">
-                {formatDate(item.checkoutDate)} → {formatDate(item.checkinDate)}
+                {formatDate(item.checkoutDate, { includeYear: false })} → {formatDate(item.checkinDate, { includeYear: false })}
               </p>
               {item.damageNote && (
                 <p className="mt-1 truncate text-xs text-status-critical">
@@ -117,7 +118,3 @@ export function FlaggedItemsSection() {
   );
 }
 
-function formatDate(dateStr: string): string {
-  const date = new Date(dateStr + "T00:00:00");
-  return date.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
-}

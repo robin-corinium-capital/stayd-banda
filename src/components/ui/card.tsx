@@ -24,6 +24,9 @@ export function Card({
     <div
       className={`rounded-card border ${variantStyles[variant]} ${interactive} ${className}`}
       onClick={onClick}
+      onKeyDown={onClick ? (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); }
+      } : undefined}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
     >

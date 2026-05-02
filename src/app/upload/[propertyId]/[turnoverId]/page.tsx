@@ -3,6 +3,7 @@
 import { useRouter, useParams } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { formatDate } from "@/lib/format";
 
 type Area = { id: string; name: string };
 
@@ -552,11 +553,3 @@ export default function UploadTurnoverPage() {
   );
 }
 
-function formatDate(dateStr: string): string {
-  const date = new Date(dateStr + "T00:00:00");
-  return date.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}

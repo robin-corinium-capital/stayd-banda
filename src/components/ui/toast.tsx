@@ -47,6 +47,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         {toasts.map((t) => (
           <div
             key={t.id}
+            role="alert"
             className={`flex items-center gap-3 rounded-btn px-4 py-3 text-sm font-medium shadow-lg animate-in slide-in-from-right ${
               t.type === "success"
                 ? "bg-brand text-white"
@@ -66,7 +67,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               </svg>
             )}
             <span className="flex-1">{t.message}</span>
-            <button onClick={() => dismiss(t.id)} className="shrink-0 opacity-70 hover:opacity-100">
+            <button onClick={() => dismiss(t.id)} aria-label="Dismiss" className="shrink-0 opacity-70 hover:opacity-100">
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>

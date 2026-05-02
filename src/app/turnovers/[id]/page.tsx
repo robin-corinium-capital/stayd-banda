@@ -2,12 +2,13 @@ import { auth } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
-import { eq, and, count, sql } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import Link from "next/link";
 import { TurnoverActions, MarkCompleteButton } from "./turnover-actions";
 import { PhotoSections } from "./photo-sections";
 import { ExportButtons } from "./export-buttons";
 import { RetentionSection } from "./retention-section";
+import { formatDate, STATUS_COLOUR, STATUS_LABEL } from "@/lib/format";
 
 export default async function TurnoverDetailPage({
   params,
@@ -85,18 +86,6 @@ export default async function TurnoverDetailPage({
   );
   const flaggedPhotos = photos.filter((p) => p.isDamageFlagged);
 
-  const statusColour: Record<string, string> = {
-    open: "bg-status-flag/20 text-status-flag",
-    in_progress: "bg-brand-dim text-brand",
-    complete: "bg-status-pass/20 text-status-pass",
-  };
-
-  const statusLabel: Record<string, string> = {
-    open: "Open",
-    in_progress: "In progress",
-    complete: "Complete",
-  };
-
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-8">
@@ -125,10 +114,10 @@ export default async function TurnoverDetailPage({
             </span>
             <span
               className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                statusColour[turnover.status || "open"]
+                STATUS_COLOUR[turnover.status || "open"]
               }`}
             >
-              {statusLabel[turnover.status || "open"]}
+              {STATUS_LABEL[turnover.status || "open"]}
             </span>
           </div>
           {turnover.departingGuestRef && (
@@ -234,13 +223,4 @@ export default async function TurnoverDetailPage({
       )}
     </div>
   );
-}
-
-function formatDate(dateStr: string): string {
-  const date = new Date(dateStr + "T00:00:00");
-  return date.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
 }

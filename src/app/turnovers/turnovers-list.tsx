@@ -33,26 +33,7 @@ type TurnoversListClientProps = {
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
 
-function formatDate(dateStr: string): string {
-  const date = new Date(dateStr + "T00:00:00");
-  return date.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
-
-const statusColour: Record<string, string> = {
-  open: "bg-status-flag/20 text-status-flag",
-  in_progress: "bg-brand-dim text-brand",
-  complete: "bg-status-pass/20 text-status-pass",
-};
-
-const statusLabel: Record<string, string> = {
-  open: "Open",
-  in_progress: "In progress",
-  complete: "Complete",
-};
+import { formatDate, STATUS_COLOUR, STATUS_LABEL } from "@/lib/format";
 
 const STATUS_OPTIONS: { label: string; value: string }[] = [
   { label: "All", value: "" },
@@ -431,10 +412,10 @@ export function TurnoversListClient({
                     <td className="px-4 py-3">
                       <span
                         className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                          statusColour[t.status || "open"]
+                          STATUS_COLOUR[t.status || "open"]
                         }`}
                       >
-                        {statusLabel[t.status || "open"]}
+                        {STATUS_LABEL[t.status || "open"]}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600">
@@ -469,10 +450,10 @@ export function TurnoversListClient({
                   </span>
                   <span
                     className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                      statusColour[t.status || "open"]
+                      STATUS_COLOUR[t.status || "open"]
                     }`}
                   >
-                    {statusLabel[t.status || "open"]}
+                    {STATUS_LABEL[t.status || "open"]}
                   </span>
                 </div>
                 <div className="mt-2 text-sm text-gray-600">

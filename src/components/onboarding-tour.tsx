@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSession } from "next-auth/react";
 
 interface TourStep {
   target: string;
@@ -34,6 +35,7 @@ const STEPS: TourStep[] = [
 const STORAGE_KEY = "banda-onboarding-complete";
 
 export function OnboardingTour() {
+  const { status } = useSession();
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [position, setPosition] = useState<{
@@ -42,10 +44,11 @@ export function OnboardingTour() {
   }>({ top: 0, left: 0 });
 
   useEffect(() => {
+    if (status !== "authenticated") return;
     if (localStorage.getItem(STORAGE_KEY)) return;
     const timer = setTimeout(() => setIsVisible(true), 500);
     return () => clearTimeout(timer);
-  }, []);
+  }, [status]);
 
   const updatePosition = useCallback(() => {
     if (!isVisible) return;

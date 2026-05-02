@@ -15,7 +15,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-base font-semibold text-gray-900">1. Service Description</h2>
             <p className="mt-2">
-              This tool (&ldquo;the Service&rdquo;) is provided by Corinium Capital Limited
+              This tool (&ldquo;the Service&rdquo;) is provided by stayd
               (&ldquo;we&rdquo;, &ldquo;us&rdquo;) for the purpose of documenting property
               condition during holiday let turnovers. The Service allows users to upload, store,
               retrieve, and export timestamped photographs and associated metadata.
@@ -132,7 +132,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-base font-semibold text-gray-900">12. Contact</h2>
             <p className="mt-2">
-              Corinium Capital Limited
+              stayd
               <br />
               <a href="mailto:hello@stayd-tools.com" className="text-brand hover:text-brand-light underline">
                 hello@stayd-tools.com

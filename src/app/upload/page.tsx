@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { formatDate } from "@/lib/format";
 
 type Turnover = {
   id: string;
@@ -108,8 +109,8 @@ export default function UploadPage() {
                     >
                       <div>
                         <p className="text-sm text-gray-700">
-                          {formatDate(t.checkoutDate)} &rarr;{" "}
-                          {formatDate(t.checkinDate)}
+                          {formatDate(t.checkoutDate, { includeYear: false })} &rarr;{" "}
+                          {formatDate(t.checkinDate, { includeYear: false })}
                         </p>
                         <span
                           className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
@@ -154,10 +155,3 @@ export default function UploadPage() {
   );
 }
 
-function formatDate(dateStr: string): string {
-  const date = new Date(dateStr + "T00:00:00");
-  return date.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-  });
-}

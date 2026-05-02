@@ -181,6 +181,59 @@ export function fakePhoto(overrides?: Record<string, unknown>) {
   };
 }
 
+// ── Additional fake data factories ────────────────────────────────────────
+
+export function fakeArea(overrides?: Record<string, unknown>) {
+  return {
+    id: "a-1",
+    propertyId: "p-1",
+    name: "Living Room",
+    description: null,
+    sortOrder: 0,
+    createdAt: new Date().toISOString(),
+    ...overrides,
+  };
+}
+
+export function fakeInvite(overrides?: Record<string, unknown>) {
+  return {
+    id: "inv-1",
+    orgId: "org-1",
+    role: "cleaner",
+    propertyIds: null,
+    token: "test-token-abc123",
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+    usedBy: null,
+    usedAt: null,
+    createdBy: "user-owner",
+    createdAt: new Date().toISOString(),
+    ...overrides,
+  };
+}
+
+export function fakeOrgMember(overrides?: Record<string, unknown>) {
+  return {
+    id: "om-1",
+    orgId: "org-1",
+    userId: "user-owner",
+    role: "owner",
+    createdAt: new Date().toISOString(),
+    ...overrides,
+  };
+}
+
+export function fakeUser(overrides?: Record<string, unknown>) {
+  return {
+    id: "user-owner",
+    email: "owner@test.com",
+    name: "Test Owner",
+    passwordHash: "$2a$10$fakehash",
+    emailVerified: true,
+    createdAt: new Date().toISOString(),
+    ...overrides,
+  };
+}
+
 // ── Schema mock factory ───────────────────────────────────────────────────
 
 export function createSchemaMock() {
@@ -195,6 +248,7 @@ export function createSchemaMock() {
       arrivingGuestRef: t("arriving_guest_ref"),
       status: t("status"),
       retentionExtended: t("retention_extended"),
+      retentionNotifiedAt: t("retention_notified_at"),
       createdBy: t("created_by"),
       createdAt: t("created_at"),
       completedAt: t("completed_at"),
@@ -271,11 +325,20 @@ export function createSchemaMock() {
       id: t("id"),
       orgId: t("org_id"),
       role: t("role"),
+      propertyIds: t("property_ids"),
       token: t("token"),
       expiresAt: t("expires_at"),
       usedBy: t("used_by"),
       usedAt: t("used_at"),
       createdBy: t("created_by"),
+      createdAt: t("created_at"),
+    },
+    passwordResetTokens: {
+      id: t("id"),
+      userId: t("user_id"),
+      token: t("token"),
+      expiresAt: t("expires_at"),
+      usedAt: t("used_at"),
       createdAt: t("created_at"),
     },
   };

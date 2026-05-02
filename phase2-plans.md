@@ -1,5 +1,24 @@
 # Phase 2 Plans — Post-Launch Polish & Support
 
+## Status: COMPLETE (1 March 2026)
+
+All 10 sections built, tested (115 tests passing), and deployed.
+
+| # | Section | Status | Commit | Notes |
+|---|---------|--------|--------|-------|
+| 1 | How-To / Support Guide | Done | `35ea739` | `/help` page with 6 sections + FAQ |
+| 2 | First-Login Onboarding Tooltips | Done | `35ea739` | 4-step tour, localStorage state |
+| 3 | Password Reset Flow | Done | `4b70f6a` | forgot-password + reset-password pages, 1h token, 8 tests |
+| 4 | Invite Acceptance Page | Done | `cd8c2d8` | `/invite/accept`, callbackUrl support on register |
+| 5 | Empty States for All List Pages | Done | — | Already existed from earlier phases, no changes needed |
+| 6 | Privacy Policy Page | Done | `5f78ff5` | `/privacy`, 11 GDPR sections, footer + register links |
+| 7 | Delete Account + GDPR Data Export | Done | `8fb60dc` | JSON export, email-confirmed deletion, R2 cleanup |
+| 8 | Rate Limiting on Public Routes | Done | `e8aab4f` | In-memory limiter: register 5/15m, forgot-pw 3/15m, presign 100/15m |
+| 9 | Loading Skeletons | Done | `790156e` | Skeleton components + loading.tsx for properties/turnovers/dashboard |
+| 10 | Error Boundaries | Done | `5f71695` | ErrorBoundary class component, error.tsx, not-found.tsx |
+
+---
+
 ## Context
 
 banda (stayd-banda) is a turnover photo documentation tool for UK holiday let owners. Phases 1-5 (core features) and Phase 6 (initial polish) are complete. This plan covers 10 remaining post-launch tasks: user support content, onboarding UX, auth flows, GDPR compliance, and resilience. Each section is a self-contained build instruction with full implementation code, designed to be fed to a Claude Code sub-agent one at a time.
